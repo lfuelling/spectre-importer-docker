@@ -1,0 +1,37 @@
+
+#
+# Travis configuration for Spectre.
+#
+
+sudo: required
+language: bash
+
+branches:
+  only:
+  - master
+
+services:
+  - docker
+
+jobs:
+  include:
+    - dist: xenial
+      arch: amd64
+      env: ARCH=amd64 VERSION=develop
+      stage: build
+      script: ./scripts/travis.sh
+    - dist: xenial
+      arch: amd64
+      env: ARCH=arm VERSION=develop
+      stage: build
+      script: ./scripts/travis.sh
+    - dist: xenial
+      arch: arm64
+      env: ARCH=arm64 VERSION=develop
+      stage: build
+      script: ./scripts/travis.sh
+    - dist: xenial
+      arch: amd64
+      env:  VERSION=develop
+      stage: manifest
+      script: ./scripts/manifest.sh

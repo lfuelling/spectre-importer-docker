@@ -1,0 +1,27 @@
+FROM fireflyiii/tools-base-image:latest-amd64
+# To learn more about this base image, visit https://github.com/firefly-iii/tools-base-image
+
+ARG version
+ENV VERSION=$version
+
+ENV HOMEPATH=/var/www/html COMPOSER_ALLOW_SUPERUSER=1
+LABEL version="1.0" maintainer="james@firefly-iii.org"
+
+COPY scripts/site.conf /etc/apache2/sites-available/000-default.conf
+
+# install Firefly III Spectre Importer and patch configuration
+WORKDIR $HOMEPATH
+
+RUN curl -SL https://github.com/firefly-iii/spectre-importer/archive/$VERSION.tar.gz | tar xzC $HOMEPATH --strip-components 1 && chown -R www-data:www-data $HOMEPATH && \
+    chmod -R 775 $HOMEPATH/storage && \
+    composer install --prefer-dist --no-dev --no-scripts --no-suggest
+
+# Expose port 80
+EXPOSE 80
+
+ADD scripts/entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+# Run entrypoint thing
+ENTRYPOINT ["/entrypoint.sh"]
