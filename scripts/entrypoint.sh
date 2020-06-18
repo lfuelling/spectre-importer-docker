@@ -44,6 +44,14 @@ php artisan config:cache > /dev/null 2>&1
 echo "..."
 chown -R www-data:www-data -R $HOMEPATH
 echo "..."
+if [ -z ${FIREFLY_III_TRUSTED_CERT_URL+x} ]; then
+  export FIREFLY_III_VERIFY_TLS_CERT=true
+else
+  openssl s_client -showcerts -connect "$FIREFLY_III_TRUSTED_CERT_URL" </dev/null 2>/dev/null|openssl x509 -outform PEM > "/trusted.pem"
+  echo "..."
+  export FIREFLY_III_VERIFY_TLS_CERT="/trusted.pem"
+fi
+echo "..."
 php artisan spectre:version
 
 if [ "$WEB_SERVER" == "false" ]; then
